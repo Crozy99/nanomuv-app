@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NanoMuv</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <div class="header-top">
+        <div class="brand">
+          <span class="brand-icon">⚡</span>
+          <h1>NanoMuv</h1>
+        </div>
+        <div class="theme-toggle-row">
+          <span class="theme-icon">🌙</span>
+          <label class="switch">
+            <input type="checkbox" id="theme-checkbox">
+            <span class="slider"></span>
+          </label>
+          <span class="theme-icon">☀️</span>
+        </div>
+      </div>
+      <p class="subtitle">Move your body. Break the sedentary cycle.</p>
+    </div>
+
+    <main>
+      <!-- Live Countdown Ring -->
+      <section class="countdown-section">
+        <div class="countdown-ring-wrap">
+          <svg class="countdown-ring" viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="52" />
+            <circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"
+                    stroke-dasharray="326.7" stroke-dashoffset="0" />
+          </svg>
+          <div class="countdown-text">
+            <p class="countdown-label">Next reminder</p>
+            <p id="countdown-display" class="countdown-number">--:--</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section class="settings-section">
+        <h2>⚙️ Settings</h2>
+        
+        <div class="setting-group">
+          <label for="interval-select">Reminder Interval (minutes)</label>
+          <select id="interval-select">
+            <option value="30">Every 30 minutes</option>
+            <option value="60" selected>Every 1 hour</option>
+            <option value="90">Every 1.5 hours</option>
+            <option value="120">Every 2 hours</option>
+            <option value="180">Every 3 hours</option>
+          </select>
+        </div>
+
+        <div class="setting-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="sound-enabled" checked>
+            Enable sound notifications
+          </label>
+        </div>
+
+        <button id="save-settings" class="btn-primary">Save Settings</button>
+      </section>
+
+      <!-- Exercise Filter -->
+      <section class="exercise-filter-section">
+        <h2>🏋️ Choose Your Exercises</h2>
+        <p class="filter-hint">Uncheck any you'd rather not see during reminders.</p>
+        <div class="exercise-checklist" id="exercise-checklist">
+          <!-- populated dynamically -->
+        </div>
+        <p class="filter-warning" id="filter-warning">Keep at least one exercise selected.</p>
+      </section>
+
+      <!-- Status Section -->
+      <section class="status-section">
+        <h2>📊 Today's Stats</h2>
+        <div class="stat-box">
+          <p>Reminders completed today</p>
+          <p id="reminders-count" class="stat-number">0</p>
+        </div>
+        <div class="stat-box">
+          <p>Current streak (days)</p>
+          <p id="streak-count" class="stat-number">0</p>
+        </div>
+        <div class="stat-box">
+          <p>All-time total</p>
+          <p id="total-count" class="stat-number">0</p>
+        </div>
+      </section>
+
+      <!-- Info Section -->
+      <section class="info-section">
+        <h2>ℹ️ About Exercise Snacks</h2>
+        <p>Brief, intense bursts of physical activity (1 minute or less) scattered throughout your day can:</p>
+        <ul>
+          <li>✅ Reduce post-meal blood sugar spikes</li>
+          <li>✅ Improve cardiovascular health</li>
+          <li>✅ Enhance cognitive function</li>
+          <li>✅ Reduce all-cause mortality risk</li>
+        </ul>
+        <p><small>Based on recent peer-reviewed research</small></p>
+
+        <button id="deep-dive-toggle" class="deep-dive-toggle">📚 Want to know more?</button>
+
+        <div class="deep-dive-panel" id="deep-dive-panel">
+          <p>A single bout of muscle contraction pulls glucose out of the bloodstream through a pathway that doesn't need much insulin, which is part of why a short, vigorous bout right before a meal can blunt the blood sugar spike that follows - no need for a long session, just enough intensity to engage the muscle strongly for a minute or so.</p>
+
+          <p>Large studies using wearable devices have tracked people who don't exercise in any structured way, and found that the vigorous minute-or-two bursts already embedded in ordinary days - rushing up a flight of stairs, a brisk uphill walk - are associated with meaningfully lower rates of death from any cause, and specifically from cardiovascular disease and cancer. The benefit shows a dose-response pattern: even small daily amounts matter, and more is generally better.</p>
+
+          <p>Repeated brief vigorous efforts also stress the cardiorespiratory system in a similar way to structured interval training, which is likely why cardiorespiratory fitness improves fairly consistently across trials. That said, evidence for other outcomes - like gains in leg strength or changes in body composition - is more mixed, and a recent meta-analysis found those effects weren't statistically significant. It's an honest, evolving picture, not a miracle fix.</p>
+
+          <h3>Sources</h3>
+          <ul class="citation-list">
+            <li>
+              <p class="citation-text">Francois, M.E., Baldi, J.C., Manning, P.J. et al. (2014). 'Exercise snacks' before meals: a novel strategy to improve glycaemic control in individuals with insulin resistance. <em>Diabetologia</em>, 57(7), 1437–1445.</p>
+              <button class="doi-link" data-url="https://doi.org/10.1007/s00125-014-3244-6">DOI: 10.1007/s00125-014-3244-6</button>
+            </li>
+            <li>
+              <p class="citation-text">Islam, H., Gibala, M.J., Little, J.P. (2022). Exercise snacks: a novel strategy to improve cardiometabolic health. <em>Exercise and Sport Sciences Reviews</em>, 50(1), 31–37.</p>
+              <button class="doi-link" data-url="https://doi.org/10.1249/JES.0000000000000275">DOI: 10.1249/JES.0000000000000275</button>
+            </li>
+            <li>
+              <p class="citation-text">Stamatakis, E., Ahmadi, M.N., Gill, J.M.R. et al. (2022). Association of wearable device-measured vigorous intermittent lifestyle physical activity with mortality. <em>Nature Medicine</em>, 28(12), 2521–2529.</p>
+              <button class="doi-link" data-url="https://doi.org/10.1038/s41591-022-02100-x">DOI: 10.1038/s41591-022-02100-x</button>
+            </li>
+            <li>
+              <p class="citation-text">Wan, K.W., Dai, Z.H., Wong, P.S. et al. (2025). Effects of exercise snacks on cardiometabolic health and body composition in adults: a systematic review and meta-analysis. <em>Scandinavian Journal of Medicine & Science in Sports</em>.</p>
+              <button class="doi-link" data-url="https://doi.org/10.1111/sms.70114">DOI: 10.1111/sms.70114</button>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>NanoMuv v0.1.0 • Built for your health</p>
+    </footer>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

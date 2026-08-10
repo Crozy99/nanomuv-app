@@ -1,0 +1,51 @@
+{
+  "name": "nanomuv",
+  "version": "0.1.0",
+  "description": "NanoMuv - A desktop app that reminds you to do exercise snacks throughout your day",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --debug",
+    "dist": "electron-builder --win"
+  },
+  "keywords": [
+    "exercise",
+    "fitness",
+    "reminder",
+    "health"
+  ],
+  "author": "Crozy99",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "electron-store": "^8.2.0"
+  },
+  "build": {
+    "appId": "com.nanomuv.app",
+    "productName": "NanoMuv",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

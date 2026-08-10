@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Snack Time!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="margin: 0; padding: 0; overflow: hidden;">
+  <div class="reminder-container">
+    <div class="reminder-content" id="reminder-content">
+      <h1>Time to Move!</h1>
+      <p>Let's do a quick exercise snack</p>
+
+      <div class="figure-stage" id="figure-stage">
+        <svg class="figure-svg" viewBox="0 0 100 140" id="figure-svg">
+          <g id="figure-root">
+            <g id="left-leg-group">
+              <line id="left-leg" x1="50" y1="80" x2="35" y2="125" class="limb" />
+            </g>
+            <g id="right-leg-group">
+              <line id="right-leg" x1="50" y1="80" x2="65" y2="125" class="limb" />
+            </g>
+            <g id="upper-body">
+              <line id="torso" x1="50" y1="42" x2="50" y2="80" class="limb torso-line" />
+              <g id="left-arm-group">
+                <line id="left-arm" x1="50" y1="42" x2="30" y2="62" class="limb" />
+              </g>
+              <g id="right-arm-group">
+                <line id="right-arm" x1="50" y1="42" x2="70" y2="62" class="limb" />
+              </g>
+              <circle id="head" cx="50" cy="26" r="11" class="figure-head" />
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="exercise-category" id="exercise-category"></div>
+      <div class="exercise-name" id="exercise-name">Loading...</div>
+
+      <div class="exercise-details">
+        <p id="exercise-description">Preparing your exercise...</p>
+        <p><strong>Reps/Sets:</strong> <span id="exercise-reps">-</span></p>
+        <p><strong>Duration:</strong> <span id="exercise-duration">~1 minute</span></p>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="timer">
+        Time for exercise: <span id="timer-display">5:00</span>
+      </div>
+
+      <div class="button-group">
+        <button id="btn-complete" class="btn-complete">✓ Done!</button>
+        <button id="btn-postpone" class="btn-postpone">⏱ Postpone 10min</button>
+      </div>
+    </div>
+
+    <!-- Success overlay shown briefly after clicking Done! -->
+    <div class="success-overlay" id="success-overlay">
+      <div class="success-checkmark">✓</div>
+      <p>Nice work!</p>
+    </div>
+  </div>
+
+  <script src="reminder.js"></script>
+</body>
+</html>
