@@ -50,14 +50,15 @@
         <h2>⚙️ Settings</h2>
         
         <div class="setting-group">
-          <label for="interval-select">Reminder Interval (minutes)</label>
+          <label for="interval-select">Reminder Interval</label>
           <select id="interval-select">
             <option value="30">Every 30 minutes</option>
             <option value="60" selected>Every 1 hour</option>
             <option value="90">Every 1.5 hours</option>
             <option value="120">Every 2 hours</option>
-            <option value="180">Every 3 hours</option>
+            <option value="custom">Custom...</option>
           </select>
+          <input type="number" id="interval-custom" min="1" max="720" placeholder="Minutes" class="custom-interval-input">
         </div>
 
         <div class="setting-group">
@@ -65,6 +66,17 @@
             <input type="checkbox" id="sound-enabled" checked>
             Enable sound notifications
           </label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-group setting-col">
+            <label for="postpone-minutes">Postpone length (min)</label>
+            <input type="number" id="postpone-minutes" min="1" max="60" value="10">
+          </div>
+          <div class="setting-group setting-col">
+            <label for="exercise-minutes">Exercise window (min)</label>
+            <input type="number" id="exercise-minutes" min="1" max="30" value="5">
+          </div>
         </div>
 
         <button id="save-settings" class="btn-primary">Save Settings</button>
@@ -143,6 +155,11 @@
 
     <footer>
       <p>NanoMuv v0.1.0 • Built for your health</p>
+      <p class="support-line">
+        <button class="support-link" data-url="https://github.com/sponsors/crozy99">💖 Support on GitHub Sponsors</button>
+        <span class="support-divider">·</span>
+        <button class="support-link secondary" data-url="https://ko-fi.com/crozy99">Ko-fi</button>
+      </p>
     </footer>
   </div>
 

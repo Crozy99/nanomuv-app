@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getStats: () => ipcRenderer.send('get-stats'),
   onStatsData: (callback) => ipcRenderer.on('stats-data', (event, data) => callback(data)),
 
-  onCountdownTick: (callback) => ipcRenderer.on('countdown-tick', (event, secondsRemaining) => callback(secondsRemaining)),
+  onCountdownTick: (callback) => ipcRenderer.on('countdown-tick', (event, data) => callback(data)),
 
   getExerciseList: () => ipcRenderer.send('get-exercise-list'),
   onExerciseListData: (callback) => ipcRenderer.on('exercise-list-data', (event, data) => callback(data)),

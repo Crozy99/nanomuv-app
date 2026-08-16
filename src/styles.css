@@ -300,6 +300,47 @@ section h2 {
   margin-bottom: 15px;
 }
 
+.setting-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.setting-col {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+input[type="number"]:hover {
+  border-color: var(--accent);
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.custom-interval-input {
+  display: none;
+  margin-top: 8px;
+}
+
+.custom-interval-input.visible {
+  display: block;
+}
+
 label {
   display: block;
   margin-bottom: 8px;
@@ -433,10 +474,9 @@ input[type="checkbox"] {
 .exercise-check-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 9px 10px;
   border-radius: 8px;
-  cursor: pointer;
   transition: background 0.15s;
 }
 
@@ -444,7 +484,16 @@ input[type="checkbox"] {
   background: var(--card-bg);
 }
 
-.exercise-check-row input {
+.exercise-check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.exercise-check-label input {
   margin: 0;
   flex-shrink: 0;
 }
@@ -472,6 +521,26 @@ input[type="checkbox"] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.checklist-video-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.checklist-video-link:hover {
+  transform: scale(1.15);
 }
 
 .exercise-check-dot {
@@ -613,6 +682,34 @@ footer {
   border-top: 1px solid var(--footer-border);
 }
 
+.support-line {
+  margin-top: 6px;
+}
+
+.support-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--heading-accent);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.support-link:hover {
+  text-decoration: underline;
+}
+
+.support-link.secondary {
+  color: var(--footer-text);
+}
+
+.support-divider {
+  color: var(--footer-text);
+  margin: 0 4px;
+  font-size: 11px;
+}
+
 /* ============ Reminder Window ============ */
 .reminder-container {
   position: relative;
@@ -716,11 +813,41 @@ footer {
   filter: drop-shadow(0 0 4px var(--figure-glow));
 }
 
+.exercise-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 10px;
+}
+
 .exercise-name {
   font-size: 30px;
   font-weight: 700;
-  margin: 4px 0 10px;
+  margin: 0;
   color: var(--exercise-name-color);
+}
+
+.video-link {
+  display: none; /* shown via JS only when this exercise has a video */
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+}
+
+.video-link:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.55);
 }
 
 .exercise-category {
@@ -893,81 +1020,143 @@ footer {
 }
 
 /* ============ Exercise Demo Animations ============ */
-#left-leg-group, #right-leg-group, #left-arm-group, #right-arm-group, #upper-body, #figure-root {
+/* The figure now has real joints: hip->knee->foot (thigh + shin) and
+   shoulder->elbow->hand (upper-arm + forearm), each an independently
+   rotatable group, nested so a shin's rotation is relative to its thigh
+   (and a forearm's relative to its upper-arm) - exactly like a real limb. */
+
+#left-thigh-group, #right-thigh-group, #left-shin-group, #right-shin-group,
+#left-upper-arm-group, #right-upper-arm-group, #left-forearm-group, #right-forearm-group,
+#upper-body, #figure-root {
   transition: none;
 }
 
-#left-leg-group, #right-leg-group, #upper-body {
-  transform-origin: 50px 80px;
+#left-thigh-group, #right-thigh-group, #upper-body {
+  transform-origin: 50px 80px; /* hip joint */
 }
 
-#left-arm-group, #right-arm-group {
-  transform-origin: 50px 42px;
+#left-shin-group { transform-origin: 44px 103px; } /* left knee */
+#right-shin-group { transform-origin: 56px 103px; } /* right knee */
+
+#left-upper-arm-group, #right-upper-arm-group {
+  transform-origin: 50px 42px; /* shoulder joint */
 }
 
+#left-forearm-group { transform-origin: 38px 55px; } /* left elbow */
+#right-forearm-group { transform-origin: 62px 55px; } /* right elbow */
+
+/* --- Air Squats: hips sink, knees bend outward, arms reach forward for balance --- */
 .anim-squat #figure-root { animation: sq-body 1.6s ease-in-out infinite; }
-.anim-squat #left-leg-group { animation: sq-leg-l 1.6s ease-in-out infinite; }
-.anim-squat #right-leg-group { animation: sq-leg-r 1.6s ease-in-out infinite; }
-@keyframes sq-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
-@keyframes sq-leg-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-10deg); } }
-@keyframes sq-leg-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(10deg); } }
+.anim-squat #left-thigh-group { animation: sq-thigh-l 1.6s ease-in-out infinite; }
+.anim-squat #right-thigh-group { animation: sq-thigh-r 1.6s ease-in-out infinite; }
+.anim-squat #left-shin-group { animation: sq-shin-l 1.6s ease-in-out infinite; }
+.anim-squat #right-shin-group { animation: sq-shin-r 1.6s ease-in-out infinite; }
+.anim-squat #left-upper-arm-group { animation: sq-arm-l 1.6s ease-in-out infinite; }
+.anim-squat #right-upper-arm-group { animation: sq-arm-r 1.6s ease-in-out infinite; }
+@keyframes sq-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(9px); } }
+@keyframes sq-thigh-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(30deg); } }
+@keyframes sq-thigh-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-30deg); } }
+@keyframes sq-shin-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-45deg); } }
+@keyframes sq-shin-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(45deg); } }
+@keyframes sq-arm-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-100deg); } }
+@keyframes sq-arm-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(100deg); } }
 
-.anim-squat-hold #figure-root { animation: hold-pulse 2.2s ease-in-out infinite; transform: translateY(8px); }
-.anim-squat-hold #left-leg-group { transform: rotate(-8deg); }
-.anim-squat-hold #right-leg-group { transform: rotate(8deg); }
-@keyframes hold-pulse { 0%, 100% { transform: translateY(8px) scale(1); } 50% { transform: translateY(8px) scale(1.02); } }
+/* --- Wall Sit: thighs horizontal, shins vertical - genuine "sitting" angle, held --- */
+.anim-squat-hold #figure-root { animation: ws-body 2.2s ease-in-out infinite; }
+.anim-squat-hold #left-thigh-group { transform: rotate(-70deg); }
+.anim-squat-hold #right-thigh-group { transform: rotate(70deg); }
+.anim-squat-hold #left-shin-group { transform: rotate(78deg); }
+.anim-squat-hold #right-shin-group { transform: rotate(-78deg); }
+@keyframes ws-body { 0%, 100% { transform: translateY(20px) scale(1); } 50% { transform: translateY(20px) scale(1.015); } }
 
+/* --- Push-ups: horizontal, elbows genuinely bend to lower/raise the body.
+       Both arms rotate the SAME direction (not mirrored) - since the figure
+       is lying face-down, both elbows fold the same way in this side view;
+       mirroring them would fold the arms into a wrong "diamond" shape. --- */
 .anim-pushup .figure-svg { transform: rotate(-90deg); }
 .anim-pushup #figure-root { animation: pu-body 1.4s ease-in-out infinite; }
-.anim-pushup #left-arm-group { animation: pu-arm-l 1.4s ease-in-out infinite; }
-.anim-pushup #right-arm-group { animation: pu-arm-r 1.4s ease-in-out infinite; }
-@keyframes pu-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(9px); } }
-@keyframes pu-arm-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
-@keyframes pu-arm-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-15deg); } }
+.anim-pushup #left-upper-arm-group { animation: pu-uarm 1.4s ease-in-out infinite; }
+.anim-pushup #right-upper-arm-group { animation: pu-uarm 1.4s ease-in-out infinite; }
+.anim-pushup #left-forearm-group { animation: pu-farm 1.4s ease-in-out infinite; }
+.anim-pushup #right-forearm-group { animation: pu-farm 1.4s ease-in-out infinite; }
+@keyframes pu-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+@keyframes pu-uarm { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-25deg); } }
+@keyframes pu-farm { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(35deg); } }
 
-.anim-jump #left-leg-group { animation: jj-leg-l 0.9s ease-in-out infinite; }
-.anim-jump #right-leg-group { animation: jj-leg-r 0.9s ease-in-out infinite; }
-.anim-jump #left-arm-group { animation: jj-arm-l 0.9s ease-in-out infinite; }
-.anim-jump #right-arm-group { animation: jj-arm-r 0.9s ease-in-out infinite; }
-.anim-jump #figure-root { animation: jj-body 0.9s ease-in-out infinite; }
-@keyframes jj-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+/* --- Jumping Jacks: limbs stay straight (shin/forearm at rest), so only the
+       hip/shoulder joints need to move. Bouncier easing gives it real snap. --- */
+.anim-jump #left-thigh-group { animation: jj-leg-l 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.anim-jump #right-thigh-group { animation: jj-leg-r 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.anim-jump #left-upper-arm-group { animation: jj-arm-l 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.anim-jump #right-upper-arm-group { animation: jj-arm-r 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.anim-jump #figure-root { animation: jj-body 0.9s cubic-bezier(0.3, 0, 0.4, 1) infinite; }
+@keyframes jj-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 @keyframes jj-leg-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-28deg); } }
 @keyframes jj-leg-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(28deg); } }
 @keyframes jj-arm-l { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-150deg); } }
 @keyframes jj-arm-r { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(150deg); } }
 
-.anim-march #left-leg-group { animation: mch-leg 1.2s ease-in-out infinite; }
-.anim-march #right-leg-group { animation: mch-leg 1.2s ease-in-out infinite; animation-delay: -0.6s; }
-.anim-march #left-arm-group { animation: mch-arm 1.2s ease-in-out infinite; animation-delay: -0.6s; }
-.anim-march #right-arm-group { animation: mch-arm 1.2s ease-in-out infinite; }
-@keyframes mch-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-38deg); } }
+/* --- March: walking / stair climbing - knee genuinely lifts and folds.
+       A subtle body bob (twice per stride) gives it real walking weight
+       instead of legs swinging under a perfectly still torso. --- */
+.anim-march #left-thigh-group { animation: mch-thigh 1.2s ease-in-out infinite; }
+.anim-march #right-thigh-group { animation: mch-thigh 1.2s ease-in-out infinite; animation-delay: -0.6s; }
+.anim-march #left-shin-group { animation: mch-shin 1.2s ease-in-out infinite; }
+.anim-march #right-shin-group { animation: mch-shin 1.2s ease-in-out infinite; animation-delay: -0.6s; }
+.anim-march #left-upper-arm-group { animation: mch-arm 1.2s ease-in-out infinite; animation-delay: -0.6s; }
+.anim-march #right-upper-arm-group { animation: mch-arm 1.2s ease-in-out infinite; }
+.anim-march #figure-root { animation: mch-body 0.6s ease-in-out infinite; }
+@keyframes mch-thigh { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-42deg); } }
+@keyframes mch-shin { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(55deg); } }
 @keyframes mch-arm { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(25deg); } }
+@keyframes mch-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
-.anim-march-fast #left-leg-group { animation: mch-leg 0.55s ease-in-out infinite; }
-.anim-march-fast #right-leg-group { animation: mch-leg 0.55s ease-in-out infinite; animation-delay: -0.275s; }
-.anim-march-fast #left-arm-group { animation: mch-arm 0.55s ease-in-out infinite; animation-delay: -0.275s; }
-.anim-march-fast #right-arm-group { animation: mch-arm 0.55s ease-in-out infinite; }
+/* --- March-fast: high knees - same mechanics, faster tempo, higher knee drive,
+       more pronounced bob to match the higher-effort movement --- */
+.anim-march-fast #left-thigh-group { animation: hk-thigh 0.5s ease-in-out infinite; }
+.anim-march-fast #right-thigh-group { animation: hk-thigh 0.5s ease-in-out infinite; animation-delay: -0.25s; }
+.anim-march-fast #left-shin-group { animation: hk-shin 0.5s ease-in-out infinite; }
+.anim-march-fast #right-shin-group { animation: hk-shin 0.5s ease-in-out infinite; animation-delay: -0.25s; }
+.anim-march-fast #left-upper-arm-group { animation: mch-arm 0.5s ease-in-out infinite; animation-delay: -0.25s; }
+.anim-march-fast #right-upper-arm-group { animation: mch-arm 0.5s ease-in-out infinite; }
+.anim-march-fast #figure-root { animation: hk-body 0.25s ease-in-out infinite; }
+@keyframes hk-thigh { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-75deg); } }
+@keyframes hk-shin { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(85deg); } }
+@keyframes hk-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
+/* --- Plank: static horizontal hold, limbs stay straight/extended --- */
 .anim-plank .figure-svg { transform: rotate(-90deg); }
 .anim-plank #figure-root { animation: hold-pulse-flat 2.4s ease-in-out infinite; }
 @keyframes hold-pulse-flat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015); } }
 
+/* --- Mountain Climbers: horizontal, knee drives dramatically toward the chest --- */
 .anim-mountain-climbers .figure-svg { transform: rotate(-90deg); }
-.anim-mountain-climbers #left-leg-group { animation: mc-leg 0.5s ease-in-out infinite; }
-.anim-mountain-climbers #right-leg-group { animation: mc-leg 0.5s ease-in-out infinite; animation-delay: -0.25s; }
-@keyframes mc-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-45deg); } }
+.anim-mountain-climbers #left-thigh-group { animation: mc-thigh 0.5s ease-in-out infinite; }
+.anim-mountain-climbers #right-thigh-group { animation: mc-thigh 0.5s ease-in-out infinite; animation-delay: -0.25s; }
+.anim-mountain-climbers #left-shin-group { animation: mc-shin 0.5s ease-in-out infinite; }
+.anim-mountain-climbers #right-shin-group { animation: mc-shin 0.5s ease-in-out infinite; animation-delay: -0.25s; }
+@keyframes mc-thigh { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-70deg); } }
+@keyframes mc-shin { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(80deg); } }
 
-.anim-lunge #left-leg-group { animation: lg-leg-front 1.8s ease-in-out infinite; }
-.anim-lunge #right-leg-group { animation: lg-leg-back 1.8s ease-in-out infinite; }
+/* --- Lunges: front knee bends under, back knee bends behind - alternating --- */
+.anim-lunge #left-thigh-group { animation: lg-thigh-front 1.8s ease-in-out infinite; }
+.anim-lunge #right-thigh-group { animation: lg-thigh-back 1.8s ease-in-out infinite; }
+.anim-lunge #left-shin-group { animation: lg-shin-front 1.8s ease-in-out infinite; }
+.anim-lunge #right-shin-group { animation: lg-shin-back 1.8s ease-in-out infinite; }
 .anim-lunge #figure-root { animation: lg-body 1.8s ease-in-out infinite; }
-@keyframes lg-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
-@keyframes lg-leg-front { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
-@keyframes lg-leg-back { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(-22deg); } }
+@keyframes lg-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+@keyframes lg-thigh-front { 0%, 100% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } }
+@keyframes lg-thigh-back { 0%, 100% { transform: rotate(30deg); } 50% { transform: rotate(-30deg); } }
+@keyframes lg-shin-front { 0%, 100% { transform: rotate(45deg); } 50% { transform: rotate(-15deg); } }
+@keyframes lg-shin-back { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(45deg); } }
 
+/* --- Burpees: compound movement - legs bend through the squat/plank stages --- */
 .anim-burpee #figure-root { animation: bp-body 2s ease-in-out infinite; }
 .anim-burpee .figure-svg { animation: bp-orient 2s ease-in-out infinite; }
-.anim-burpee #left-leg-group { animation: bp-leg 2s ease-in-out infinite; }
-.anim-burpee #right-leg-group { animation: bp-leg 2s ease-in-out infinite; }
+.anim-burpee #left-thigh-group { animation: bp-thigh 2s ease-in-out infinite; }
+.anim-burpee #right-thigh-group { animation: bp-thigh 2s ease-in-out infinite; }
+.anim-burpee #left-shin-group { animation: bp-shin 2s ease-in-out infinite; }
+.anim-burpee #right-shin-group { animation: bp-shin 2s ease-in-out infinite; }
 @keyframes bp-orient {
   0%, 15% { transform: rotate(0deg); }
   35%, 60% { transform: rotate(-80deg) translate(-18px, 10px); }
@@ -975,40 +1164,33 @@ footer {
 }
 @keyframes bp-body {
   0%, 15% { transform: translateY(0); }
+  25% { transform: translateY(10px); }
   35%, 60% { transform: translateY(8px); }
-  75% { transform: translateY(8px); }
+  75% { transform: translateY(10px); }
   90% { transform: translateY(-8px); }
   100% { transform: translateY(0); }
 }
-@keyframes bp-leg {
+@keyframes bp-thigh {
   0%, 15% { transform: rotate(0deg); }
+  25% { transform: rotate(-20deg); }
   35%, 60% { transform: rotate(4deg); }
+  75% { transform: rotate(-20deg); }
+  80%, 100% { transform: rotate(0deg); }
+}
+@keyframes bp-shin {
+  0%, 15% { transform: rotate(0deg); }
+  25% { transform: rotate(28deg); }
+  35%, 60% { transform: rotate(0deg); }
+  75% { transform: rotate(28deg); }
   80%, 100% { transform: rotate(0deg); }
 }
 
+/* --- Glute Bridges: lying down, knees bent with feet planted, hips lift and lower.
+       Both legs bend the SAME direction (not mirrored) so they overlap like a
+       real side view, instead of mirroring into a diamond shape. --- */
 .anim-bridge .figure-svg { transform: rotate(-90deg); }
-.anim-bridge #figure-root { animation: br-body 1.4s ease-in-out infinite; }
-@keyframes br-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-
-.anim-raise #figure-root { animation: cr-body 0.8s ease-in-out infinite; }
-@keyframes cr-body { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-.anim-twist #upper-body { animation: tw-body 1.6s ease-in-out infinite; }
-@keyframes tw-body { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(18deg); } }
-
-.anim-roll #left-arm-group { animation: rl-arm 1.8s ease-in-out infinite; }
-.anim-roll #right-arm-group { animation: rl-arm 1.8s ease-in-out infinite; animation-delay: -0.3s; }
-@keyframes rl-arm {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(15deg); }
-  50% { transform: rotate(0deg); }
-  75% { transform: rotate(-15deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.anim-fold #upper-body { animation: fd-body 2.4s ease-in-out infinite; }
-@keyframes fd-body {
-  0%, 20% { transform: rotate(0deg); }
-  50%, 70% { transform: rotate(60deg); }
-  100% { transform: rotate(0deg); }
-}
+.anim-bridge #left-thigh-group { transform: rotate(-40deg); }
+.anim-bridge #right-thigh-group { transform: rotate(-40deg); }
+.anim-bridge #left-shin-group { animation: bd-shin 1.4s ease-in-out infinite; }
+.anim-bridge #right-shin-group { animation: bd-shin 1.4s ease-in-out infinite; }
+@keyframes bd-shin { 0%, 100% { transform: rotate(50deg); } 50% { transform: rotate(33deg); } }

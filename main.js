@@ -10,6 +10,8 @@ const store = new Store({
       interval: 60, // minutes
       soundEnabled: true,
       theme: 'dark', // 'dark' or 'light'
+      postponeMinutes: 10, // how long a postpone delays the next reminder
+      exerciseMinutes: 5,  // how long the exercise window lasts on the reminder screen
     },
     stats: {
       totalCompleted: 0,      // all-time completed exercises
@@ -18,8 +20,8 @@ const store = new Store({
       lastCompletionDate: null, // 'YYYY-MM-DD' string, local time
     },
     // Which exercises are allowed to appear in the reminder rotation.
-    // Defaults to all 16 enabled.
-    enabledExerciseIds: Array.from({ length: 16 }, (_, i) => i + 1),
+    // Defaults to all 12 enabled.
+    enabledExerciseIds: Array.from({ length: 12 }, (_, i) => i + 1),
   },
 });
 
@@ -28,6 +30,9 @@ let tray = null;
 let timerInterval = null;
 let reminderWindow = null;
 let timeElapsed = 0;
+// The target for the CURRENT cycle - normally equals the interval, but gets
+// temporarily shortened by a postpone, then reset back to normal afterward.
+let currentCycleTargetSeconds = 60 * 60;
 
 // Tracks the last few exercise ids shown, so we don't repeat one
 // too soon. Session-only (resets on app restart) - that's fine,
@@ -38,9 +43,12 @@ const NO_REPEAT_WINDOW = 5; // won't repeat any of the last 5 shown
 // postponeAllowed is per-session/per-cycle, not persisted
 let userSettings = {
   theme: 'dark',
+  postponeMinutes: 10,
+  exerciseMinutes: 5,
   ...store.get('settings'),
   postponeAllowed: true,
 };
+currentCycleTargetSeconds = (userSettings.interval || 60) * 60;
 
 // Which exercises the user wants in rotation - kept in memory, synced with store
 let enabledExerciseIds = store.get('enabledExerciseIds');
@@ -87,6 +95,7 @@ const exercises = [
     shortDesc: 'Bend knees, sit back, stand up',
     reps: '15-20',
     duration: '1 minute',
+    videoUrl: 'https://www.youtube.com/watch?v=a_fb6Kz7FQg',
   },
   {
     id: 2,
@@ -98,6 +107,7 @@ const exercises = [
     shortDesc: 'Lower and press up off the floor',
     reps: '10-15',
     duration: '1-2 minutes',
+    videoUrl: 'https://www.youtube.com/watch?v=WDIpL0pjun0',
   },
   {
     id: 3,
@@ -109,6 +119,7 @@ const exercises = [
     shortDesc: 'Jump feet apart, arms overhead',
     reps: '20-30',
     duration: '1 minute',
+    videoUrl: 'https://www.youtube.com/shorts/bT2iY8IjEU0',
   },
   {
     id: 4,
@@ -131,6 +142,7 @@ const exercises = [
     shortDesc: 'Hold a straight-body forearm plank',
     reps: '1 set',
     duration: '30-60 seconds',
+    videoUrl: 'https://www.youtube.com/shorts/v25dawSzRTM',
   },
   {
     id: 6,
@@ -153,6 +165,7 @@ const exercises = [
     shortDesc: 'Step forward, lower, alternate legs',
     reps: '10 each leg',
     duration: '1-2 minutes',
+    videoUrl: 'https://www.youtube.com/shorts/BYe4uyGF-h4',
   },
   {
     id: 8,
@@ -164,6 +177,7 @@ const exercises = [
     shortDesc: 'Squat, plank, push-up, jump',
     reps: '8-12',
     duration: '1-2 minutes',
+    videoUrl: 'https://www.youtube.com/watch?v=NCqbpkoiyXE',
   },
   {
     id: 9,
@@ -175,6 +189,7 @@ const exercises = [
     shortDesc: 'Jog in place, knees up high',
     reps: '30-40 total',
     duration: '1 minute',
+    videoUrl: 'https://www.youtube.com/shorts/LJMrXG_vPQ8',
   },
   {
     id: 10,
@@ -186,6 +201,7 @@ const exercises = [
     shortDesc: 'Drive knees in from plank position',
     reps: '20-30 total',
     duration: '1 minute',
+    videoUrl: 'https://www.youtube.com/watch?v=ruQ4ZwncXBg',
   },
   {
     id: 11,
@@ -197,6 +213,7 @@ const exercises = [
     shortDesc: 'Hold a seated position against a wall',
     reps: '1 set',
     duration: '30-45 seconds',
+    videoUrl: 'https://www.youtube.com/watch?v=cWTZ8Am1Ee0',
   },
   {
     id: 12,
@@ -208,50 +225,7 @@ const exercises = [
     shortDesc: 'Lift hips from a lying position',
     reps: '15-20',
     duration: '1 minute',
-  },
-  {
-    id: 13,
-    name: 'Calf Raises',
-    category: 'strength',
-    icon: '🦶',
-    animation: 'raise',
-    description: 'Stand with feet flat. Rise up onto your toes as high as possible, then lower back down slowly.',
-    shortDesc: 'Rise onto your toes and lower',
-    reps: '20-25',
-    duration: '1 minute',
-  },
-  {
-    id: 14,
-    name: 'Standing Torso Twist',
-    category: 'mobility',
-    icon: '🔄',
-    animation: 'twist',
-    description: 'Stand with feet hip-width apart. Rotate your upper body slowly side to side, letting your arms swing naturally.',
-    shortDesc: 'Rotate your torso side to side',
-    reps: '10 each side',
-    duration: '1 minute',
-  },
-  {
-    id: 15,
-    name: 'Shoulder & Neck Rolls',
-    category: 'mobility',
-    icon: '🤷',
-    animation: 'roll',
-    description: 'Roll your shoulders backward in slow circles, then forward. Gently tilt your head side to side to release neck tension.',
-    shortDesc: 'Roll shoulders, tilt neck gently',
-    reps: '10 each direction',
-    duration: '1 minute',
-  },
-  {
-    id: 16,
-    name: 'Standing Forward Fold',
-    category: 'mobility',
-    icon: '🙇',
-    animation: 'fold',
-    description: 'Stand with feet hip-width apart and slowly hinge forward at the hips, reaching toward your toes. Let your neck relax.',
-    shortDesc: 'Hinge forward, reach toward toes',
-    reps: '1 set',
-    duration: '30-45 seconds',
+    videoUrl: 'https://www.youtube.com/watch?v=OUgsJ8-Vi0E',
   },
 ];
 
@@ -324,7 +298,17 @@ ipcMain.on('update-settings', (event, settings) => {
     interval: userSettings.interval,
     soundEnabled: userSettings.soundEnabled,
     theme: userSettings.theme,
+    postponeMinutes: userSettings.postponeMinutes,
+    exerciseMinutes: userSettings.exerciseMinutes,
   });
+
+  // If a postpone isn't currently in effect, apply the new interval to the
+  // running timer right away rather than waiting for the next cycle.
+  if (userSettings.postponeAllowed) {
+    currentCycleTargetSeconds = (userSettings.interval || 60) * 60;
+    timeElapsed = Math.min(timeElapsed, currentCycleTargetSeconds);
+  }
+
   event.reply('settings-updated', userSettings);
 });
 
@@ -346,6 +330,7 @@ ipcMain.on('get-exercise-list', (event) => {
       icon: ex.icon,
       category: ex.category,
       shortDesc: ex.shortDesc,
+      videoUrl: ex.videoUrl,
     })),
     enabledIds: enabledExerciseIds,
   });
@@ -396,7 +381,10 @@ function pickNextExercise() {
 ipcMain.on('postpone-reminder', (event) => {
   if (userSettings.postponeAllowed) {
     userSettings.postponeAllowed = false;
-    timeElapsed = 0; // Reset timer
+    timeElapsed = 0;
+    // A postpone is a SHORT one-time delay, not the full interval again -
+    // this was previously a bug: it just reset to the full interval.
+    currentCycleTargetSeconds = (userSettings.postponeMinutes || 10) * 60;
     if (reminderWindow) {
       reminderWindow.close();
     }
@@ -410,6 +398,7 @@ ipcMain.on('complete-exercise', (event) => {
   }
   userSettings.postponeAllowed = true;
   timeElapsed = 0;
+  currentCycleTargetSeconds = (userSettings.interval || 60) * 60;
 
   // Update persistent stats
   const stats = store.get('stats');
@@ -446,18 +435,19 @@ ipcMain.on('complete-exercise', (event) => {
 function startTimer() {
   timerInterval = setInterval(() => {
     timeElapsed += 1;
-    const intervalSeconds = userSettings.interval * 60;
-    const remaining = Math.max(intervalSeconds - timeElapsed, 0);
+    const remaining = Math.max(currentCycleTargetSeconds - timeElapsed, 0);
 
     // Live countdown for the dashboard - only send if it's actually open/visible,
-    // no point updating a hidden window
+    // no point updating a hidden window. Sends both remaining and the total
+    // target so the ring displays correctly even during a shortened postpone cycle.
     if (mainWindow && mainWindow.isVisible()) {
-      mainWindow.webContents.send('countdown-tick', remaining);
+      mainWindow.webContents.send('countdown-tick', { remaining, total: currentCycleTargetSeconds });
     }
 
-    if (timeElapsed >= intervalSeconds) {
+    if (timeElapsed >= currentCycleTargetSeconds) {
       showReminder();
       timeElapsed = 0;
+      currentCycleTargetSeconds = (userSettings.interval || 60) * 60; // back to normal for next cycle
     }
   }, 1000);
 }

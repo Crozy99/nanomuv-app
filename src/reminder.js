@@ -1,14 +1,22 @@
 // Reminder window renderer logic
-const TOTAL_SECONDS = 300; // 5 minutes
+let TOTAL_SECONDS = 300; // default 5 minutes - overwritten once real settings arrive
 let timeRemaining = TOTAL_SECONDS;
 let postponeAllowed = true;
 let timerInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Apply the same theme the user picked on the dashboard
+  // Apply the same theme the user picked on the dashboard, and use their
+  // configured exercise-window length. Countdown only starts once this
+  // arrives, so it never briefly runs with the wrong duration.
   window.electronAPI.getSettings();
   window.electronAPI.onSettingsData((data) => {
     document.body.classList.toggle('light-theme', data.theme === 'light');
+    TOTAL_SECONDS = (data.exerciseMinutes || 5) * 60;
+    timeRemaining = TOTAL_SECONDS;
+    startCountdown();
+
+    const postponeMins = data.postponeMinutes || 10;
+    document.getElementById('btn-postpone').textContent = `⏱ Postpone ${postponeMins}min`;
   });
 
   // Request exercise data
@@ -18,9 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.electronAPI.onExerciseData((exercise) => {
     displayExercise(exercise);
   });
-
-  // Start countdown timer
-  startCountdown();
 
   // Button handlers
   document.getElementById('btn-complete').addEventListener('click', () => {
@@ -40,14 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Video demo link - only visible when this exercise has one (set in displayExercise)
+  document.getElementById('video-link').addEventListener('click', (e) => {
+    const url = e.currentTarget.dataset.url;
+    if (url) window.electronAPI.openExternalLink(url);
+  });
+
   // Play notification sound (optional - comment out if no sound)
   playNotificationSound();
 });
 
 const ANIMATION_CLASSES = [
   'anim-squat', 'anim-squat-hold', 'anim-pushup', 'anim-jump', 'anim-march',
-  'anim-march-fast', 'anim-plank', 'anim-mountain-climbers', 'anim-lunge',
-  'anim-burpee', 'anim-bridge', 'anim-raise', 'anim-twist', 'anim-roll', 'anim-fold',
+  'anim-march-fast', 'anim-plank', 'anim-mountain-climbers', 'anim-lunge', 'anim-burpee', 'anim-bridge',
 ];
 
 function displayExercise(exercise) {
@@ -59,6 +69,16 @@ function displayExercise(exercise) {
   const categoryEl = document.getElementById('exercise-category');
   categoryEl.textContent = exercise.category;
   categoryEl.className = 'exercise-category category-' + exercise.category;
+
+  // Show the video demo button only if this exercise has a link
+  const videoBtn = document.getElementById('video-link');
+  if (exercise.videoUrl) {
+    videoBtn.style.display = 'flex';
+    videoBtn.dataset.url = exercise.videoUrl;
+  } else {
+    videoBtn.style.display = 'none';
+    videoBtn.dataset.url = '';
+  }
 
   // Swap the stick-figure animation to match this exercise's movement pattern
   const stage = document.getElementById('figure-stage');

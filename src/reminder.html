@@ -18,19 +18,31 @@
       <div class="figure-stage" id="figure-stage">
         <svg class="figure-svg" viewBox="0 0 100 140" id="figure-svg">
           <g id="figure-root">
-            <g id="left-leg-group">
-              <line id="left-leg" x1="50" y1="80" x2="35" y2="125" class="limb" />
+            <g id="left-thigh-group">
+              <line id="left-thigh" x1="50" y1="80" x2="44" y2="103" class="limb" />
+              <g id="left-shin-group">
+                <line id="left-shin" x1="44" y1="103" x2="40" y2="125" class="limb" />
+              </g>
             </g>
-            <g id="right-leg-group">
-              <line id="right-leg" x1="50" y1="80" x2="65" y2="125" class="limb" />
+            <g id="right-thigh-group">
+              <line id="right-thigh" x1="50" y1="80" x2="56" y2="103" class="limb" />
+              <g id="right-shin-group">
+                <line id="right-shin" x1="56" y1="103" x2="60" y2="125" class="limb" />
+              </g>
             </g>
             <g id="upper-body">
               <line id="torso" x1="50" y1="42" x2="50" y2="80" class="limb torso-line" />
-              <g id="left-arm-group">
-                <line id="left-arm" x1="50" y1="42" x2="30" y2="62" class="limb" />
+              <g id="left-upper-arm-group">
+                <line id="left-upper-arm" x1="50" y1="42" x2="38" y2="55" class="limb" />
+                <g id="left-forearm-group">
+                  <line id="left-forearm" x1="38" y1="55" x2="32" y2="64" class="limb" />
+                </g>
               </g>
-              <g id="right-arm-group">
-                <line id="right-arm" x1="50" y1="42" x2="70" y2="62" class="limb" />
+              <g id="right-upper-arm-group">
+                <line id="right-upper-arm" x1="50" y1="42" x2="62" y2="55" class="limb" />
+                <g id="right-forearm-group">
+                  <line id="right-forearm" x1="62" y1="55" x2="68" y2="64" class="limb" />
+                </g>
               </g>
               <circle id="head" cx="50" cy="26" r="11" class="figure-head" />
             </g>
@@ -38,7 +50,10 @@
         </svg>
       </div>
       <div class="exercise-category" id="exercise-category"></div>
-      <div class="exercise-name" id="exercise-name">Loading...</div>
+      <div class="exercise-name-row">
+        <div class="exercise-name" id="exercise-name">Loading...</div>
+        <button class="video-link" id="video-link" data-url="" title="Watch a demo video">▶</button>
+      </div>
 
       <div class="exercise-details">
         <p id="exercise-description">Preparing your exercise...</p>
@@ -55,7 +70,7 @@
 
       <div class="button-group">
         <button id="btn-complete" class="btn-complete">✓ Done!</button>
-        <button id="btn-postpone" class="btn-postpone">⏱ Postpone 10min</button>
+        <button id="btn-postpone" class="btn-postpone">⏱ Postpone</button>
       </div>
     </div>
 
