@@ -41,4 +41,4 @@ If this policy changes, the updated version will be posted at this same URL with
 
 ## Contact
 
-Questions about this policy can be sent via the contact email listed on the Chrome Web Store listing, or by opening an issue on the [GitHub repository](https://github.com/crozy99/nanomuv).
+Questions about this policy can be sent via the contact email listed on the Chrome Web Store listing, or by opening an issue on the [GitHub repository](https://github.com/crozy99/nanomuv-app).
